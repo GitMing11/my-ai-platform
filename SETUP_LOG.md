@@ -28,6 +28,30 @@ npm install -D prisma
 - ENOENT(Error No Entry): AppData\Roaming\npm 없음
 - 해결: npm 폴더 직접 생성
 
+---
+
 npx prisma init
 
-npm install dotenv
+npm install --save-dev prisma dotenv
+
+npx prisma db push
+
+npx prisma migrate dev --name init
+
+---
+
+https://console.cloud.google.com
+[API] 구글 로그인 API (구글 OAuth 2.0 웹 로그인) - https://minibcake.tistory.com/222
+
+OAuth 동의 화면 - 외부 - 만들기
+클라이언트 생성 -> 데이터 액세스 - 범위 추가
+
+npm install next-auth@beta @auth/prisma-adapter
+
+npm install ai @ai-sdk/google
+
+npm install zod
+
+npm install clsx tailwind-merge sonner
+
+npm install @supabase/supabase-js

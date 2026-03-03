@@ -5,10 +5,129 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
-  output   = "../app/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+// --- Enums ---
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+}
+
+// --- Models ---
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  role          Role      @default(USER) // 기본값은 유저, 최초 가입 시 이메일 체크로 ADMIN 승격
+
+  // NextAuth 필수 관계
+  accounts Account[]
+  sessions Session[]
+
+  // AI 기능 관련
+  chats Chat[]
+
+  // 액세스 코드 연결: 유저가 어떤 코드를 통해 가입/인증되었는지 기록
+  accessCodeId String?
+  accessCode   AccessCode? @relation(fields: [accessCodeId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+}
+
+model AccessCode {
+  id        String    @id @default(cuid())
+  code      String    @unique
+  maxUses   Int       @default(10) // 이 코드로 가입 가능한 최대 인원
+  usedCount Int       @default(0) // 현재까지 사용한 인원
+  expiresAt DateTime? // 코드 만료일 (선택 사항)
+  isActive  Boolean   @default(true)
+
+  users User[] // 이 코드를 사용하는 유저들
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Chat {
+  id       String    @id @default(cuid())
+  title    String?   @default("새로운 대화")
+  userId   String
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages Message[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Message {
+  id      String      @id @default(cuid())
+  chatId  String
+  chat    Chat        @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  role    String // 'user' 또는 'assistant' (OpenAI/Gemini 규격)
+  content String      @db.Text
+  type    MessageType @default(TEXT)
+
+  // 2차 목표(이미지 생성)를 위한 확장 필드
+  // 이미지 URL이나 생성 옵션(Prompt, Seed 등)을 JSON으로 유연하게 저장
+  metadata Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([chatId])
+}
+
+// --- NextAuth 필수 모델 (Auth.js 표준) ---
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
 }
