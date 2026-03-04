@@ -40,6 +40,8 @@ npx prisma migrate dev --name init
 
 ---
 
+## 📅 2026-03-03
+
 https://console.cloud.google.com
 [API] 구글 로그인 API (구글 OAuth 2.0 웹 로그인) - https://minibcake.tistory.com/222
 
@@ -54,4 +56,19 @@ npm install zod
 
 npm install clsx tailwind-merge sonner
 
-npm install @supabase/supabase-js
+## npm install @supabase/supabase-js
+
+## 📅 2026-03-04
+
+### 발생한 에러
+
+app/generate에 migrations 저장되던 상태
+
+- 해결:
+
+```bash
+npx prisma migrate reset
+npx prisma migrate dev --name init
+```
+
+npm install @supabase/ssr

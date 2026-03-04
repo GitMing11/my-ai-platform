@@ -1,65 +1,77 @@
-import Image from "next/image";
+import Header from './components/Header';
 
 export default function Home() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+	return (
+		<div className="flex min-h-screen flex-col bg-ui-bg text-ui-text-main">
+			<main className="flex-1">
+				{/* Hero Section */}
+				<section className="relative flex flex-col items-center justify-center px-4 py-32 text-center">
+					{/* Radial Gradient - 브랜드 컬러 활용 */}
+					<div className="absolute inset-0 bg-[radial-gradient(circle_at_center,var(--color-brand-primary)_0%,transparent_70%)] opacity-15 -z-10" />
+
+					<h1 className="mb-6 text-5xl font-extrabold tracking-tight sm:text-7xl">
+						Next Generation <br />
+						<span className="bg-linear-to-r from-brand-primary to-brand-secondary bg-clip-text text-transparent">
+							AI Chat Platform
+						</span>
+					</h1>
+
+					<p className="mb-10 max-w-160 text-ui-text-muted sm:text-xl leading-relaxed">
+						더 빠르고 스마트한 업무를 위한 프라이빗 AI 에이전트.
+						<br />
+						최신 LLM 모델을 통해 제한 없는 대화와 생산성을 경험하세요.
+					</p>
+
+					<div className="flex flex-wrap justify-center gap-6">
+						{/* Feature Card 1: AI Chat */}
+						<div className="group rounded-2xl border border-ui-border bg-ui-card p-8 backdrop-blur-sm w-72 text-left hover:border-brand-primary/50 transition-all">
+							<h3 className="text-xl font-bold mb-3 text-brand-primary">
+								Advanced Chat
+							</h3>
+							<p className="text-sm text-ui-text-dim leading-relaxed">
+								복잡한 질문에도 명확한 해답을 제시하는 지능형 대화 엔진을
+								경험하세요.
+							</p>
+						</div>
+
+						{/* Feature Card 2: AI Tools */}
+						<div className="group rounded-2xl border border-ui-border bg-ui-card p-8 backdrop-blur-sm w-72 text-left hover:border-brand-secondary/50 transition-all">
+							<h3 className="text-xl font-bold mb-3 text-brand-secondary">
+								Smart Tools
+							</h3>
+							<p className="text-sm text-ui-text-dim leading-relaxed">
+								이미지 생성부터 텍스트 분석까지, 플랫폼 하나로 모든 작업이
+								가능합니다.
+							</p>
+						</div>
+					</div>
+				</section>
+
+				{/* Feature Section Preview */}
+				<section className="container mx-auto px-4 py-24 border-t border-ui-border">
+					<div className="grid gap-16 md:grid-cols-2 items-center">
+						<div className="space-y-6">
+							<h2 className="text-4xl font-bold tracking-tight">
+								Access Control
+							</h2>
+							<p className="text-lg text-ui-text-muted leading-relaxed">
+								개별 인증 코드를 통한 프라이빗 가입 시스템을 제공합니다.
+								<br />
+								검증된 사용자들만을 위한 고성능 AI 환경에서 안심하고 대화하세요.
+							</p>
+						</div>
+						<div className="aspect-video rounded-2xl bg-ui-card border border-ui-border flex items-center justify-center text-ui-text-dim shadow-2xl">
+							<span className="font-mono text-sm tracking-widest uppercase">
+								System Dashboard Interface
+							</span>
+						</div>
+					</div>
+				</section>
+			</main>
+
+			<footer className="border-t border-ui-border py-12 text-center text-sm text-ui-text-dim">
+				<p>© 2026 AI Platform Project. Built for Productivity.</p>
+			</footer>
+		</div>
+	);
 }

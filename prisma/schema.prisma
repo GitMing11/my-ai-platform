@@ -14,9 +14,16 @@ datasource db {
 
 // --- Enums ---
 
-enum Role {
+enum UserRole {
   USER
   ADMIN
+}
+
+enum MessageRole {
+  system
+  user
+  assistant
+  data
 }
 
 enum MessageType {
@@ -32,7 +39,7 @@ model User {
   email         String?   @unique
   emailVerified DateTime?
   image         String?
-  role          Role      @default(USER) // 기본값은 유저, 최초 가입 시 이메일 체크로 ADMIN 승격
+  role          UserRole  @default(USER) // 기본값은 유저, 최초 가입 시 이메일 체크로 ADMIN 승격
 
   // NextAuth 필수 관계
   accounts Account[]
@@ -72,27 +79,33 @@ model Chat {
   user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   messages Message[]
 
+  isArchived Boolean @default(false)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([userId])
+  @@index([createdAt(sort: Desc)])
 }
 
 model Message {
-  id      String      @id @default(cuid())
-  chatId  String
-  chat    Chat        @relation(fields: [chatId], references: [id], onDelete: Cascade)
-  role    String // 'user' 또는 'assistant' (OpenAI/Gemini 규격)
+  id     String @id @default(cuid())
+  chatId String
+  chat   Chat   @relation(fields: [chatId], references: [id], onDelete: Cascade)
+
+  role    MessageRole @default(user)
   content String      @db.Text
-  type    MessageType @default(TEXT)
+
+  type MessageType @default(TEXT)
 
   // 2차 목표(이미지 생성)를 위한 확장 필드
-  // 이미지 URL이나 생성 옵션(Prompt, Seed 등)을 JSON으로 유연하게 저장
+  // AI SDK 사용 시 필요한 메타데이터 (이미지 URL, 모델 정보 등)
   metadata Json?
 
   createdAt DateTime @default(now())
 
   @@index([chatId])
+  @@index([createdAt])
 }
 
 // --- NextAuth 필수 모델 (Auth.js 표준) ---
@@ -110,6 +123,8 @@ model Account {
   scope             String?
   id_token          String? @db.Text
   session_state     String?
+
+  refresh_token_expires_in Int?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
