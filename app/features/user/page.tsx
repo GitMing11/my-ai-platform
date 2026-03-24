@@ -12,10 +12,11 @@ import {
 	MessageSquare,
 } from 'lucide-react';
 import Link from 'next/link';
+import type { User } from 'next-auth';
 
 export default function UserPage() {
 	const router = useRouter();
-	const [user, setUser] = useState<any>(null);
+	const [user, setUser] = useState<User | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 
 	// 1. 페이지 접속 시 세션(로그인 상태) 확인

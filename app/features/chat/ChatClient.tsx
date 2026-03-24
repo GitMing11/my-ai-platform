@@ -3,15 +3,16 @@
 import { useState } from 'react';
 import { saveMessage, createChat, getMessages } from './actions';
 import { AI_PROMPTS } from '@/lib/ai/prompts';
+import { ChatListItem } from '@/types/chat';
 
 export default function ChatClient({
 	initialChats,
 	userId,
 }: {
-	initialChats: any[];
+	initialChats: ChatListItem[];
 	userId: string;
 }) {
-	const [chats, setChats] = useState<any[]>(initialChats);
+	const [chats, setChats] = useState<ChatListItem[]>(initialChats);
 	const [activeChatId, setActiveChatId] = useState<string | null>(
 		initialChats[0]?.id || null,
 	);

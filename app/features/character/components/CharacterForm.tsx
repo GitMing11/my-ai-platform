@@ -3,10 +3,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createCharacter, updateCharacter, deleteCharacter } from '../actions';
+import type { Character } from '@prisma/client';
 
 interface CharacterFormProps {
 	userId: string;
-	initialData?: any; // 수정 시에만 전달
+	initialData?: Character | null; // 수정 시에만 전달
 }
 
 export default function CharacterForm({
@@ -45,7 +46,8 @@ export default function CharacterForm({
 
 		setIsLoading(true);
 		try {
-			if (isEditMode) {
+			// TypeScript 에러 방지를 위해 initialData 존재 여부 명시적 확인
+			if (isEditMode && initialData) {
 				await updateCharacter(initialData.id, formData);
 			} else {
 				await createCharacter(userId, formData);
@@ -61,7 +63,9 @@ export default function CharacterForm({
 	};
 
 	const handleDelete = async () => {
+		if (!initialData) return; // TypeScript 타입 가드
 		if (!confirm('정말로 이 캐릭터를 삭제하시겠습니까?')) return;
+
 		setIsLoading(true);
 		try {
 			await deleteCharacter(initialData.id);
@@ -70,7 +74,7 @@ export default function CharacterForm({
 		} catch (error) {
 			console.error(error);
 			alert('삭제 중 오류가 발생했습니다.');
-			setIsLoading(false);
+			setIsLoading(false); // 에러 시에만 로딩 해제 (성공 시엔 페이지 이동되므로)
 		}
 	};
 

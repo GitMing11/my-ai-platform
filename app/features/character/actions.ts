@@ -2,9 +2,10 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { CharacterPayload } from "@/types/character";
 
 // 1. 캐릭터 생성 (Create)
-export async function createCharacter(userId: string, data: any) {
+export async function createCharacter(userId: string, data: CharacterPayload) {
     const character = await prisma.character.create({
         data: {
             ...data,
@@ -31,7 +32,7 @@ export async function getCharacterById(id: string) {
 }
 
 // 4. 캐릭터 수정 (Update)
-export async function updateCharacter(id: string, data: any) {
+export async function updateCharacter(id: string, data: Partial<CharacterPayload>) {
     const character = await prisma.character.update({
         where: { id },
         data,
