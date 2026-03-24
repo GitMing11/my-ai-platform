@@ -1,15 +1,20 @@
 'use client';
 
 import { useState } from 'react';
+import { Message } from '@prisma/client';
 import { saveMessage, createChat, getMessages } from '../actions';
 import { AI_PROMPTS } from '@/src/lib/ai/prompts';
 import { ChatListItem } from '@/src/types/chat';
 
 export default function ChatClient({
 	initialChats,
+	initialMessages,
+	activeChatId: serverActiveChatId,
 	userId,
 }: {
 	initialChats: ChatListItem[];
+	initialMessages: Message[];
+	activeChatId: string;
 	userId: string;
 }) {
 	const [chats, setChats] = useState<ChatListItem[]>(initialChats);
@@ -21,12 +26,14 @@ export default function ChatClient({
 
 	const [messages, setMessages] = useState<
 		{ role: 'user' | 'assistant'; content: string }[]
-	>([
-		{
-			role: 'assistant',
-			content: AI_PROMPTS.greeting,
-		},
-	]);
+	>(
+		initialMessages.length > 0
+			? initialMessages.map((m) => ({
+					role: m.role === 'user' ? 'user' : 'assistant',
+					content: m.content,
+				}))
+			: [{ role: 'assistant', content: AI_PROMPTS.greeting }],
+	);
 
 	// 새로운 대화방 생성 로직
 	const handleCreateChat = async () => {
@@ -105,11 +112,19 @@ export default function ChatClient({
 			// 유저 메시지를 DB에 저장
 			await saveMessage(currentChatId, 'user', userMessage);
 
-			// AI 응답 요청
+			// 현재 대화방의 characterId 찾기
+			const currentChat = chats.find((c) => c.id === currentChatId);
+			const targetCharacterId = currentChat?.characterId || 'default-character';
+
+			// API Route로 메시지와 characterId 전송
 			const response = await fetch('/api/ai', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ message: userMessage }),
+				body: JSON.stringify({
+					message: userMessage,
+					characterId: targetCharacterId,
+					chatId: currentChatId,
+				}),
 			});
 
 			if (!response.ok) throw new Error('API 요청에 실패했습니다.');

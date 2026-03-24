@@ -29,7 +29,6 @@ export default function Header() {
 	}, [pathname]);
 
 	const navItems = [
-		{ name: 'Home', href: ROUTES.HOME },
 		{ name: 'Chat', href: ROUTES.CHAT.ROOM },
 		{ name: 'Characters', href: ROUTES.CHARACTER.LIST },
 	];
@@ -61,10 +60,7 @@ export default function Header() {
 				<nav className="absolute left-1/2 transform -translate-x-1/2 hidden md:block">
 					<ul className="flex items-center p-1.5 rounded-full bg-ui-bg border border-ui-border">
 						{navItems.map((item) => {
-							const isActive =
-								item.href === ROUTES.HOME
-									? pathname === ROUTES.HOME
-									: pathname.startsWith(item.href);
+							const isActive = pathname.startsWith(item.href);
 
 							return (
 								<li key={item.name}>
@@ -170,10 +166,7 @@ export default function Header() {
 				<div className="md:hidden border-t border-ui-border bg-ui-bg/95 backdrop-blur-md">
 					<ul className="flex flex-col p-4 space-y-2">
 						{navItems.map((item) => {
-							const isActive =
-								item.href === ROUTES.HOME
-									? pathname === ROUTES.HOME
-									: pathname.startsWith(item.href);
+							const isActive = pathname.startsWith(item.href);
 
 							return (
 								<li key={item.name}>

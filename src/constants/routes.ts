@@ -16,5 +16,6 @@ export const ROUTES = {
   },
   CHAT: {
     ROOM: '/chat',
+    NEW: '/chat/new',
   }
 } as const;
