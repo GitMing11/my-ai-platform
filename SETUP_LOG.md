@@ -143,3 +143,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 export default prisma;
 ```
+
+https://ai.google.dev/gemini-api/docs/api-key?hl=ko#javascript
+
+npm install @google/genai
