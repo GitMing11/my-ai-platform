@@ -1,4 +1,4 @@
-'use client'; // 클라이언트에서 호출할 수 있도록 설정
+'use server'; 
 
 import { prisma } from "@/lib/prisma";
 

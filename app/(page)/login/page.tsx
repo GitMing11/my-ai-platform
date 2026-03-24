@@ -1,9 +1,32 @@
 'use client';
 
-import { signIn } from 'next-auth/react';
+import { signIn, useSession } from 'next-auth/react';
 import Link from 'next/link';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
+	// NextAuth에서 현재 로그인 상태(status)를 가져옵니다.
+	const { status } = useSession();
+	const router = useRouter();
+
+	// 1. 이미 로그인된 상태인지 확인하고 마이페이지(/user)로 리다이렉트
+	useEffect(() => {
+		if (status === 'authenticated') {
+			router.push('/user');
+		}
+	}, [status, router]);
+
+	// 2. 로그인 상태를 확인하는 동안 보여줄 로딩 화면 (깜빡임 방지)
+	if (status === 'loading') {
+		return (
+			<div className="flex min-h-screen items-center justify-center bg-ui-bg">
+				<div className="h-8 w-8 animate-spin rounded-full border-4 border-ui-border border-t-brand-primary"></div>
+			</div>
+		);
+	}
+
+	// 3. 로그인이 되어있지 않은 경우('unauthenticated')에만 로그인 화면 렌더링
 	return (
 		<div className="flex min-h-screen flex-col bg-ui-bg text-ui-text-main">
 			{/* 배경 그라데이션 효과 */}
@@ -25,7 +48,7 @@ export default function LoginPage() {
 
 					<div className="space-y-4">
 						<button
-							onClick={() => signIn('google', { callbackUrl: '/' })}
+							onClick={() => signIn('google', { callbackUrl: '/user' })}
 							className="flex w-full items-center justify-center gap-3 rounded-xl bg-white px-4 py-3.5 text-sm font-semibold text-black transition-all hover:bg-zinc-200 active:scale-[0.98]"
 						>
 							<svg
@@ -59,10 +82,6 @@ export default function LoginPage() {
 					</div>
 				</div>
 			</main>
-
-			<footer className="py-8 text-center text-xs text-ui-text-dim">
-				© 2026 AI Platform Project.
-			</footer>
 		</div>
 	);
 }

@@ -46,7 +46,8 @@ model User {
   sessions Session[]
 
   // AI 기능 관련
-  chats Chat[]
+  chats      Chat[]
+  characters Character[]
 
   // 액세스 코드 연결: 유저가 어떤 코드를 통해 가입/인증되었는지 기록
   accessCodeId String?
@@ -72,11 +73,47 @@ model AccessCode {
   updatedAt DateTime @updatedAt
 }
 
+model Character {
+  id   String @id @default(cuid())
+  name String // 캐릭터 이름
+
+  // 캐릭터 기본 설정
+  personality String? @db.Text // 성격
+  speechStyle String? @db.Text // 말투
+  appearance  String? @db.Text // 외모
+  imageUrl    String? // 캐릭터 이미지 (추후 사용을 위해 선택 사항으로 배치)
+
+  // 스토리 및 롤플레이 설정
+  genre     String? // 장르 (예: 판타지, 로맨스, 무협 등)
+  worldview String? @db.Text // 세계관 및 스토리 배경 설정
+  castSetup String? @db.Text // 기타 등장인물 외모, 성격, 말투 등 세부 설정
+
+  customPrompt String? @db.Text // 유저가 직접 작성한 시스템 프롬프트 (이 값이 있으면 다른 세부 설정보다 우선 적용)
+  isPublic     Boolean @default(false) // 다른 유저에게 이 캐릭터를 공개할지 여부
+
+  // 생성자(유저)와의 관계
+  creatorId String
+  creator   User   @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+
+  // 이 캐릭터와 연결된 대화방들
+  chats Chat[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([creatorId])
+}
+
 model Chat {
-  id       String    @id @default(cuid())
-  title    String?   @default("새로운 대화")
-  userId   String
-  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id    String  @id @default(cuid())
+  title String? @default("새로운 대화")
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  characterId String
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
   messages Message[]
 
   isArchived Boolean @default(false)
@@ -85,6 +122,7 @@ model Chat {
   updatedAt DateTime @updatedAt
 
   @@index([userId])
+  @@index([characterId])
   @@index([createdAt(sort: Desc)])
 }
 

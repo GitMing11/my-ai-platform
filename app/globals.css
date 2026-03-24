@@ -1,25 +1,66 @@
 @import "tailwindcss";
 
+/* 1. Tailwind 유틸리티 클래스 생성 매핑 */
 @theme {
   /* Brand Colors */
-  --color-brand-primary: hsl(217 91% 60%);
-  --color-brand-secondary: hsl(160 84% 39%);
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-secondary: var(--brand-secondary);
   
   /* UI Colors */
-  --color-ui-bg: hsl(0 0% 4%);
-  --color-ui-border: rgba(255, 255, 255, 0.1);
-  --color-ui-card: rgba(24, 24, 27, 0.5); /* zinc-900/50 */
-  --color-ui-text-main: hsl(0 0% 100%);
-  --color-ui-text-muted: hsl(240 5% 65%);
-  --color-ui-text-dim: hsl(240 4% 46%); /* zinc-500 */
+  --color-ui-bg: var(--ui-bg);
+  --color-ui-border: var(--ui-border);
+  --color-ui-card: var(--ui-card);
+  --color-ui-text-main: var(--ui-text-main);
+  --color-ui-text-muted: var(--ui-text-muted);
+  --color-ui-text-dim: var(--ui-text-dim);
 }
 
+/* 2. 라이트 모드 (기본 색상) */
 :root {
-  background-color: var(--color-ui-bg);
-  color: var(--color-ui-text-main);
+  /* Brand Colors */
+  --brand-primary: hsl(217 91% 60%);
+  --brand-secondary: hsl(160 84% 39%);
+
+  /* UI Colors - Light */
+  --ui-bg: hsl(0 0% 100%); /* 화이트 배경 */
+  --ui-border: rgba(0, 0, 0, 0.1); /* 어두운 테두리 */
+  --ui-card: hsl(0 0% 98%); /* 아주 밝은 회색 카드 */
+  --ui-text-main: hsl(0 0% 4%); /* 검은색 텍스트 */
+  --ui-text-muted: hsl(240 5% 40%); /* 짙은 회색 텍스트 */
+  --ui-text-dim: hsl(240 4% 60%); /* 옅은 회색 텍스트 */
 }
+
+/* 3. 다크 모드 (사용자가 작성한 기존 색상 적용) */
+.dark {
+  /* UI Colors - Dark */
+  --ui-bg: hsl(0 0% 4%);
+  --ui-border: rgba(255, 255, 255, 0.1);
+  --ui-card: rgba(24, 24, 27, 0.5); /* zinc-900/50 */
+  --ui-text-main: hsl(0 0% 100%);
+  --ui-text-muted: hsl(240 5% 65%);
+  --ui-text-dim: hsl(240 4% 46%); /* zinc-500 */
+}
+
+/* (선택) 시스템 다크모드 설정을 기본으로 따르게 하려면 아래 주석을 해제하세요. */
+/*
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    --ui-bg: hsl(0 0% 4%);
+    --ui-border: rgba(255, 255, 255, 0.1);
+    --ui-card: rgba(24, 24, 27, 0.5);
+    --ui-text-main: hsl(0 0% 100%);
+    --ui-text-muted: hsl(240 5% 65%);
+    --ui-text-dim: hsl(240 4% 46%);
+  }
+}
+*/
 
 body {
+  background-color: var(--color-ui-bg);
+  color: var(--color-ui-text-main);
   margin: 0;
   padding: 0;
+  
+  /* 테마 전환 시 부드러운 애니메이션 효과 추가 */
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
