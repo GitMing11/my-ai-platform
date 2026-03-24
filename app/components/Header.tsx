@@ -28,8 +28,8 @@ export default function Header() {
 	}, [pathname]);
 
 	const navItems = [
-		{ name: 'Chat', href: '/chat' },
-		{ name: 'Characters', href: '/characters' },
+		{ name: 'Chat', href: '/features/chat' },
+		{ name: 'Characters', href: '/features/character' },
 	];
 
 	// NextAuth 규격에 맞춘 닉네임 파싱
@@ -109,7 +109,7 @@ export default function Header() {
 							{user ? (
 								// 로그인 상태: 마이페이지 링크 (닉네임 + 프로필 이미지)
 								<Link
-									href="/user"
+									href="/features/user"
 									className="flex items-center gap-2 p-1.5 rounded-full hover:bg-ui-card transition-all border border-transparent hover:border-ui-border group"
 								>
 									{/* <div className="flex items-center text-sm font-semibold text-ui-text-main">
@@ -139,7 +139,7 @@ export default function Header() {
 							) : (
 								// 비로그인 상태: 로그인 버튼
 								<Link
-									href="/login"
+									href="/features/login"
 									className="hidden md:flex items-center gap-1.5 px-4 py-2 rounded-full bg-brand-primary text-white text-sm font-semibold hover:opacity-90 transition-all shadow-sm active:scale-95"
 								>
 									<LogIn
@@ -194,7 +194,7 @@ export default function Header() {
 						<li className="pt-3 mt-1 border-t border-ui-border">
 							{user ? (
 								<Link
-									href="/user"
+									href="/features/user"
 									className="flex w-full items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold text-ui-text-main bg-ui-card/50 hover:bg-ui-card transition-all"
 								>
 									<User size={18} />
@@ -202,7 +202,7 @@ export default function Header() {
 								</Link>
 							) : (
 								<Link
-									href="/login"
+									href="/features/login"
 									className="flex w-full items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold text-white bg-brand-primary hover:opacity-90 transition-all shadow-sm"
 								>
 									<LogIn size={18} />

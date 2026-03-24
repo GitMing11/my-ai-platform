@@ -13,7 +13,7 @@ export default function LoginPage() {
 	// 1. 이미 로그인된 상태인지 확인하고 마이페이지(/user)로 리다이렉트
 	useEffect(() => {
 		if (status === 'authenticated') {
-			router.push('/user');
+			router.push('/features/user');
 		}
 	}, [status, router]);
 
@@ -48,7 +48,9 @@ export default function LoginPage() {
 
 					<div className="space-y-4">
 						<button
-							onClick={() => signIn('google', { callbackUrl: '/user' })}
+							onClick={() =>
+								signIn('google', { callbackUrl: '/features/user' })
+							}
 							className="flex w-full items-center justify-center gap-3 rounded-xl bg-white px-4 py-3.5 text-sm font-semibold text-black transition-all hover:bg-zinc-200 active:scale-[0.98]"
 						>
 							<svg

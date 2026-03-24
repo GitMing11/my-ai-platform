@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { saveMessage, createChat, getMessages } from './actions';
+import { AI_PROMPTS } from '@/lib/ai/prompts';
 
 export default function ChatClient({
 	initialChats,
@@ -9,23 +11,70 @@ export default function ChatClient({
 	initialChats: any[];
 	userId: string;
 }) {
-	const [chats] = useState(initialChats);
+	const [chats, setChats] = useState<any[]>(initialChats);
 	const [activeChatId, setActiveChatId] = useState<string | null>(
 		initialChats[0]?.id || null,
 	);
 	const [input, setInput] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
 
-	// 대화 내역 상태 관리
 	const [messages, setMessages] = useState<
 		{ role: 'user' | 'assistant'; content: string }[]
 	>([
 		{
 			role: 'assistant',
-			content:
-				'새로운 프로젝트에 오신 것을 환영합니다! 어떤 애니메이션 스타일의 캐릭터를 만들어볼까요? 외형, 성격, 세계관 등을 자유롭게 알려주세요.',
+			content: AI_PROMPTS.greeting,
 		},
 	]);
+
+	// 새로운 대화방 생성 로직
+	const handleCreateChat = async () => {
+		setIsLoading(true);
+		try {
+			// actions.ts에 추가하신 characterId 파라미터가 필요합니다.
+			// 현재는 임시값('default-character')을 넣었으며, 추후 캐릭터 선택 로직과 연동하세요.
+			const newChat = await createChat(
+				userId,
+				'default-character',
+				'새로운 대화',
+			);
+
+			setChats((prev) => [newChat, ...prev]); // 사이드바 목록 최상단에 추가
+			setActiveChatId(newChat.id); // 활성화된 채팅방 변경
+			setMessages([{ role: 'assistant', content: AI_PROMPTS.greeting }]); // 메시지 초기화
+		} catch (error) {
+			console.error('채팅방 생성 에러:', error);
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	// 기존 대화방 클릭 시 과거 메시지 불러오기 로직
+	const handleSelectChat = async (chatId: string) => {
+		if (chatId === activeChatId) return; // 이미 선택된 방이면 무시
+
+		setActiveChatId(chatId);
+		setIsLoading(true);
+
+		try {
+			const pastMessages = await getMessages(chatId);
+			if (pastMessages.length > 0) {
+				// DB 구조(MessageRole)에 맞춰 타입 변환 후 세팅
+				setMessages(
+					pastMessages.map((m) => ({
+						role: m.role === 'user' ? 'user' : 'assistant',
+						content: m.content,
+					})),
+				);
+			} else {
+				setMessages([{ role: 'assistant', content: AI_PROMPTS.greeting }]);
+			}
+		} catch (error) {
+			console.error('메시지 불러오기 에러:', error);
+		} finally {
+			setIsLoading(false);
+		}
+	};
 
 	// 메시지 전송 로직
 	const handleSendMessage = async () => {
@@ -38,8 +87,24 @@ export default function ChatClient({
 		setMessages((prev) => [...prev, { role: 'user', content: userMessage }]);
 		setIsLoading(true);
 
+		// ※ 방이 없을 경우 전송 시점에 자동 생성하는 로직
+		let currentChatId = activeChatId;
+		if (!currentChatId) {
+			const newChat = await createChat(
+				userId,
+				'default-character',
+				'새로운 대화',
+			);
+			setChats((prev) => [newChat, ...prev]);
+			setActiveChatId(newChat.id);
+			currentChatId = newChat.id;
+		}
+
 		try {
-			// API Route로 메시지 전송
+			// 유저 메시지를 DB에 저장
+			await saveMessage(currentChatId, 'user', userMessage);
+
+			// AI 응답 요청
 			const response = await fetch('/api/ai', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
@@ -49,12 +114,16 @@ export default function ChatClient({
 			if (!response.ok) throw new Error('API 요청에 실패했습니다.');
 
 			const data = await response.json();
+			const aiMessage = data.result;
 
 			// AI 응답을 화면에 추가
 			setMessages((prev) => [
 				...prev,
-				{ role: 'assistant', content: data.result },
+				{ role: 'assistant', content: aiMessage },
 			]);
+
+			// AI 응답을 DB에 저장
+			await saveMessage(currentChatId, 'assistant', aiMessage);
 		} catch (error) {
 			console.error(error);
 			setMessages((prev) => [
@@ -81,11 +150,13 @@ export default function ChatClient({
 	return (
 		<>
 			{/* 사이드바: 대화 리스트 */}
-			{/* 기존 bg-black/20 -> bg-ui-card/50 변경하여 테마 연동 */}
 			<aside className="hidden w-72 flex-col border-r border-ui-border bg-ui-card/50 md:flex">
 				<div className="p-4">
-					{/* 기존 hover:bg-white/5 -> hover:bg-ui-border/50 변경 */}
-					<button className="w-full rounded-xl border border-ui-border bg-ui-card py-2.5 text-sm font-medium hover:bg-ui-border/50 transition-all text-ui-text-main">
+					<button
+						onClick={handleCreateChat}
+						disabled={isLoading}
+						className="w-full rounded-xl border border-ui-border bg-ui-card py-2.5 text-sm font-medium hover:bg-ui-border/50 transition-all text-ui-text-main disabled:opacity-50"
+					>
 						+ 새로운 스토리 시작
 					</button>
 				</div>
@@ -93,7 +164,7 @@ export default function ChatClient({
 					{chats.map((chat) => (
 						<div
 							key={chat.id}
-							onClick={() => setActiveChatId(chat.id)}
+							onClick={() => handleSelectChat(chat.id)}
 							className={`rounded-lg px-4 py-3 text-sm cursor-pointer transition-all ${
 								activeChatId === chat.id
 									? 'bg-brand-primary/10 text-brand-primary border border-brand-primary/20'
@@ -108,7 +179,6 @@ export default function ChatClient({
 
 			{/* 메인 채팅창 */}
 			<main className="flex flex-1 flex-col relative bg-ui-bg">
-				{/* CSS 변수를 직접 활용한 배경 그라데이션 (정상 작동) */}
 				<div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,var(--color-brand-primary)_0%,transparent_50%)] opacity-5 pointer-events-none" />
 
 				{/* 메시지 영역 */}
@@ -123,8 +193,8 @@ export default function ChatClient({
 								<div
 									className={`max-w-[85%] rounded-2xl p-5 text-sm md:text-base leading-relaxed whitespace-pre-wrap ${
 										msg.role === 'user'
-											? 'bg-brand-primary text-white rounded-tr-none shadow-md' // 유저 메시지는 강조되도록 white 유지
-											: 'bg-ui-card border border-ui-border rounded-tl-none font-light text-ui-text-main shadow-sm' // text-zinc-200 -> text-ui-text-main 변경
+											? 'bg-brand-primary text-brand-contrast rounded-tr-none shadow-md'
+											: 'bg-ui-card border border-ui-border rounded-tl-none font-light text-ui-text-main shadow-sm'
 									}`}
 								>
 									{msg.content}
@@ -136,7 +206,6 @@ export default function ChatClient({
 						{isLoading && (
 							<div className="flex justify-start">
 								<div className="max-w-[85%] rounded-2xl p-5 text-sm md:text-base bg-ui-card border border-ui-border rounded-tl-none font-light text-ui-text-muted animate-pulse">
-									{/* text-zinc-400 -> text-ui-text-muted 변경 */}
 									답변을 생성하고 있습니다...
 								</div>
 							</div>
@@ -159,7 +228,7 @@ export default function ChatClient({
 						<button
 							onClick={handleSendMessage}
 							disabled={isLoading || !input.trim()}
-							className="absolute right-4 bottom-5 rounded-xl bg-brand-primary p-2.5 text-white hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-brand-primary/20 disabled:opacity-50 disabled:active:scale-100"
+							className="absolute right-4 bottom-5 rounded-xl bg-brand-primary p-2.5 text-brand-contrast hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-brand-primary/20 disabled:opacity-50 disabled:active:scale-100"
 						>
 							<svg
 								width="20"

@@ -25,7 +25,7 @@ export default function UserPage() {
 
 			if (!session?.user) {
 				// 비로그인 상태면 로그인 페이지로 강제 이동
-				router.push('/login');
+				router.push('/features/login');
 			} else {
 				setUser(session.user);
 			}
@@ -124,7 +124,7 @@ export default function UserPage() {
 					{/* 활동 내역 바로가기 (캐릭터 / 채팅) */}
 					<div className="grid gap-4 sm:grid-cols-2">
 						<Link
-							href="/characters"
+							href="/features/character"
 							className="group rounded-2xl border border-ui-border bg-ui-card p-5 shadow-sm hover:border-brand-primary/50 transition-colors cursor-pointer"
 						>
 							<div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-brand-primary/10 text-brand-primary group-hover:bg-brand-primary group-hover:text-white transition-colors">
@@ -139,7 +139,7 @@ export default function UserPage() {
 						</Link>
 
 						<Link
-							href="/chat"
+							href="/features/chat"
 							className="group rounded-2xl border border-ui-border bg-ui-card p-5 shadow-sm hover:border-brand-primary/50 transition-colors cursor-pointer"
 						>
 							<div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-brand-primary/10 text-brand-primary group-hover:bg-brand-primary group-hover:text-white transition-colors">

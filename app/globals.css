@@ -5,6 +5,7 @@
   /* Brand Colors */
   --color-brand-primary: var(--brand-primary);
   --color-brand-secondary: var(--brand-secondary);
+  --color-brand-contrast: var(--brand-contrast);
   
   /* UI Colors */
   --color-ui-bg: var(--ui-bg);
@@ -20,6 +21,7 @@
   /* Brand Colors */
   --brand-primary: hsl(217 91% 60%);
   --brand-secondary: hsl(160 84% 39%);
+  --brand-contrast: hsl(0 0% 100%);
 
   /* UI Colors - Light */
   --ui-bg: hsl(0 0% 100%); /* 화이트 배경 */
@@ -33,6 +35,8 @@
 /* 3. 다크 모드 (사용자가 작성한 기존 색상 적용) */
 .dark {
   /* UI Colors - Dark */
+  --brand-contrast: hsl(0 0% 100%);
+
   --ui-bg: hsl(0 0% 4%);
   --ui-border: rgba(255, 255, 255, 0.1);
   --ui-card: rgba(24, 24, 27, 0.5); /* zinc-900/50 */
